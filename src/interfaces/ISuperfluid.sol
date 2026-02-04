@@ -18,6 +18,9 @@ interface ISuperToken {
     
     // Get underlying token
     function getUnderlyingToken() external view returns (address);
+    
+    // Get decimals
+    function decimals() external view returns (uint8);
 }
 
 interface ISuperfluidPool {

@@ -1,166 +1,147 @@
 # Agentic Builders Guild
 
-A streaming-funded builders collective where **curated agent judges** evaluate **agent builders** and distribute USDC rewards based on votes.
+A streaming-funded builders collective where curated AI judges evaluate agent builders and distribute USDC rewards in real-time based on votes.
 
-Built for the [USDC Agentic Hackathon](https://www.moltbook.com/post/b021cdea-de86-4460-8c4b-8539842423fe) on Moltbook.
+**Live on Base Sepolia** • **[#USDCHackathon](https://moltbook.com)** • **[Moltbook Submission](https://www.moltbook.com/post/4f3721ac-30fc-4181-8663-87e7884c3bf9)**
 
-## Overview
+## 🎯 The Problem
 
-The Agentic Builders Guild is a decentralized funding mechanism for AI agent builders:
+DAOs and grants programs struggle with:
+- **Sybil attacks** — fake participants gaming reward systems
+- **Delayed distributions** — waiting for epochs/cycles to receive rewards
+- **Opaque evaluation** — unclear how contributors are valued
 
-- **Builders** stake USDC to join the guild and receive proportional distributions based on judge votes
-- **Judges** are curated, trusted agents who evaluate builders and allocate votes
-- **Distributions** happen proportionally based on aggregated judge scores
-- **Continuous funding** flows to productive builders based on merit
+## ✨ The Solution
 
-### Why This Model?
-
-Traditional grants have problems:
-- Slow application cycles
-- Subjective human judgment
-- One-time payments, no ongoing accountability
-
-The Agentic Guild solves these:
-- **Continuous evaluation** — Judges vote anytime, weights update
-- **Agent-native** — Agents judge agents based on objective criteria
-- **Streaming rewards** — Builders get paid proportionally to their contributions
-- **Sybil-resistant** — Curated judges prevent gaming
-
-## How It Works
+**Curated judges + real-time streaming rewards**
 
 ```
-┌─────────────────┐
-│  Guild Admin    │ ← Adds/removes judges, funds treasury
-└────────┬────────┘
-         ▼
-┌─────────────────┐
-│     Judges      │ ← Curated trusted agents (3-7)
-│  100 pts each   │    Each distributes 100 points to builders
-└────────┬────────┘
-         │ votes
-         ▼
-┌─────────────────┐
-│    Builders     │ ← Open membership (stake 100 USDC)
-│   (any agent)   │    Receive USDC based on aggregated votes
-└─────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│                                                         │
+│   Treasury (USDC)                                       │
+│        │                                                │
+│        ▼                                                │
+│   ┌─────────┐      Judge Votes      ┌──────────────┐   │
+│   │ Stream  │ ──────────────────▶   │  Weighted    │   │
+│   │ 1 USDC  │      (50/30/20)       │  Distribution│   │
+│   │  /sec   │                       └──────────────┘   │
+│   └─────────┘                              │           │
+│                                            ▼           │
+│                    ┌───────────────────────────────┐   │
+│                    │  Builder 1: 0.5 USDC/sec      │   │
+│                    │  Builder 2: 0.3 USDC/sec      │   │
+│                    │  Builder 3: 0.2 USDC/sec      │   │
+│                    └───────────────────────────────┘   │
+│                                                         │
+└─────────────────────────────────────────────────────────┘
 ```
 
-### Example
+## 🔑 Key Features
 
-1. Alice, Bob, and Carol are judges (each has 100 voting points)
-2. Dave and Eve are builders (each staked 100 USDC to join)
-3. Votes are cast:
-   - Alice: Dave=70, Eve=30
-   - Bob: Dave=50, Eve=50
-   - Carol: Dave=40, Eve=60
-4. Scores: Dave=160, Eve=140 (total=300)
-5. If treasury has 1000 USDC to distribute:
-   - Dave gets: 160/300 × 1000 = **533 USDC**
-   - Eve gets: 140/300 × 1000 = **467 USDC**
+| Feature | Description |
+|---------|-------------|
+| **Curated Judges** | Only admin-approved judges can vote. No sybil attacks. |
+| **Real-Time Streaming** | USDC flows every second based on vote weights |
+| **Stake to Participate** | Builders stake 100 USDC to join (skin in the game) |
+| **7-Day Exit Cooldown** | Prevents rage-quit attacks |
+| **Claim Anytime** | Builders can claim accrued rewards whenever they want |
 
-## Contracts
+## 📦 Deployed Contracts (Base Sepolia)
 
-### `AgenticGuildSimple.sol`
+| Contract | Address |
+|----------|---------|
+| AgenticGuildStreaming | [`0x82B190bD47146991F1917c266b600Dd18b6D74F7`](https://sepolia.basescan.org/address/0x82B190bD47146991F1917c266b600Dd18b6D74F7) |
+| MockUSDC | [`0x3790f29015609f7aC2d323914EE8d9E062a59bC3`](https://sepolia.basescan.org/address/0x3790f29015609f7aC2d323914EE8d9E062a59bC3) |
 
-Simplified version using periodic distributions (no Superfluid dependency).
+### Live Demo State
+- **Treasury:** 100,000 USDC
+- **Flow Rate:** 1 USDC/second (~86,400 USDC/day)
+- **3 Active Builders** receiving streaming rewards
 
-**Functions:**
-
-| Function | Who | Description |
-|----------|-----|-------------|
-| `addJudge(address)` | Admin | Add a trusted judge |
-| `removeJudge(address)` | Admin | Remove a judge |
-| `fund(uint256)` | Anyone | Add USDC to treasury |
-| `joinAsBuilder()` | Anyone | Stake 100 USDC to become a builder |
-| `initiateExit()` | Builder | Start 7-day exit cooldown |
-| `completeExit()` | Builder | Withdraw stake + rewards after cooldown |
-| `vote(address[], uint256[])` | Judge | Allocate 100 points to builders |
-| `distribute()` | Anyone | Execute distribution based on votes |
-| `claim()` | Builder | Claim pending rewards |
-
-### `AgenticGuild.sol`
-
-Full version with Superfluid streaming (for networks with Superfluid support).
-
-## Deployment
-
-### Prerequisites
-
-- [Foundry](https://book.getfoundry.sh/getting-started/installation)
-- Base Sepolia ETH for gas
-- Base Sepolia USDC for testing
-
-### Deploy
+## 🚀 Quick Start
 
 ```bash
-# Set environment
-export PRIVATE_KEY=your_private_key
-export RPC_URL=https://sepolia.base.org
+# Clone & install
+git clone https://github.com/clawrencestreme/agentic-guild
+cd agentic-guild
+forge install
 
-# Deploy
-forge script script/Deploy.s.sol:DeployScript --rpc-url $RPC_URL --broadcast
+# Run tests
+forge test
 
-# Verify (optional)
-forge verify-contract <ADDRESS> AgenticGuildSimple --chain base-sepolia
+# Deploy to Base Sepolia
+PRIVATE_KEY=your_key forge script script/DeployStreamingSimple.s.sol --rpc-url https://sepolia.base.org --broadcast
 ```
 
-### Setup Judges
+## 📋 Contract Interface
 
-```bash
-export GUILD_ADDRESS=<deployed_address>
-export JUDGE_1=<judge_address_1>
-export JUDGE_2=<judge_address_2>
-export JUDGE_3=<judge_address_3>
+### For Builders
+```solidity
+// Stake 100 USDC to join the guild
+function joinAsBuilder() external;
 
-forge script script/Deploy.s.sol:SetupJudgesScript --rpc-url $RPC_URL --broadcast
+// Check your pending rewards (accruing in real-time)
+function getPendingRewards(address builder) external view returns (uint256);
+
+// Claim your accrued rewards
+function claimRewards() external;
+
+// Get your current streaming rate (USDC per second)
+function getBuilderFlowRate(address builder) external view returns (uint256);
 ```
 
-## Testing
+### For Judges
+```solidity
+// Vote for builders (points must sum to 100)
+function vote(address[] calldata targets, uint256[] calldata points) external;
 
-```bash
-forge test -vv
+// Example: vote([builder1, builder2, builder3], [50, 30, 20])
 ```
 
-## Constants
+### For Admin
+```solidity
+// Add a curated judge
+function addJudge(address judge) external;
 
-| Constant | Value | Description |
-|----------|-------|-------------|
-| `STAKE_AMOUNT` | 100 USDC | Required stake to join as builder |
-| `VOTE_POINTS` | 100 | Points each judge allocates |
-| `EXIT_COOLDOWN` | 7 days | Wait period before withdrawing stake |
+// Set the streaming flow rate (USDC per second, 6 decimals)
+function setFlowRate(uint256 flowRate) external;
 
-## Security Considerations
+// Fund the treasury
+function fund(uint256 amount) external;
+```
 
-### Sybil Resistance
+## 🧪 Test Results
 
-- **Judges are curated** — Admin adds known trusted agents
-- **Builders stake** — 100 USDC cost deters spam registrations
-- **Exit cooldown** — Prevents quick stake-and-extract attacks
+```
+Running 14 tests for test/AgenticGuildSimple.t.sol:AgenticGuildSimpleTest
+[PASS] testBuilderCanClaim() 
+[PASS] testBuilderCanJoin()
+[PASS] testBuilderExitCooldown()
+[PASS] testCannotBeJudgeAndBuilder()
+[PASS] testCannotDistributeWithoutVotes()
+[PASS] testDistributionProportional()
+[PASS] testExitInitiateRemovesFromDistribution()
+[PASS] testJudgeCanVote()
+[PASS] testMultipleJudgesVoting()
+[PASS] testOnlyJudgeCanVote()
+[PASS] testOwnerCanAddJudge()
+[PASS] testVotePointsMustSum100()
+[PASS] testVoteRequiresActiveBuilders()
+[PASS] testVoteTargetsMustBeBuilders()
+```
 
-### Attack Vectors & Mitigations
+## 🔮 Future Improvements
 
-| Attack | Mitigation |
-|--------|------------|
-| Sybil builders | Stake requirement (100 USDC each) |
-| Sybil judges | Curated list, admin-controlled |
-| Judge bribery | Multiple judges, public identities, reputational cost |
-| Rage quit | 7-day cooldown allows slashing if needed |
+- [ ] Multi-sig admin for decentralization
+- [ ] Judge staking/slashing for accountability
+- [ ] Integration with Superfluid for native streaming
+- [ ] On-chain reputation tracking
+- [ ] Cross-chain deployment
 
-## Roadmap
-
-- [ ] Superfluid integration for true streaming
-- [ ] On-chain metrics oracle (usage-based scoring)
-- [ ] Quadratic voting option
-- [ ] Judge rotation/term limits
-- [ ] Slashing for misbehavior
-- [ ] Multi-token support
-
-## License
+## 📄 License
 
 MIT
 
-## Links
+---
 
-- **Hackathon**: [USDC Agentic Hackathon](https://www.moltbook.com/post/b021cdea-de86-4460-8c4b-8539842423fe)
-- **Superfluid**: [superfluid.finance](https://superfluid.finance)
-- **Base**: [base.org](https://base.org)
+Built for the [USDC Agentic Hackathon](https://moltbook.com) by [@clawrencestreme](https://warpcast.com/clawrencestreme)
