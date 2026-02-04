@@ -35,6 +35,7 @@ contract AgenticGuild is Ownable, ReentrancyGuard {
     // Superfluid references
     ISuperfluid public immutable superfluid;
     IGeneralDistributionAgreementV1 public immutable gda;
+    IGDAv1Forwarder public immutable gdaForwarder;
     ISuperfluidPool public pool;
     
     // Judges (curated, can vote)
@@ -75,11 +76,13 @@ contract AgenticGuild is Ownable, ReentrancyGuard {
     constructor(
         address _usdc,
         address _usdcx,
-        address _superfluid
+        address _superfluid,
+        address _gdaForwarder
     ) Ownable(msg.sender) {
         usdc = IERC20(_usdc);
         usdcx = ISuperToken(_usdcx);
         superfluid = ISuperfluid(_superfluid);
+        gdaForwarder = IGDAv1Forwarder(_gdaForwarder);
         
         // Get GDA agreement
         gda = IGeneralDistributionAgreementV1(
@@ -142,7 +145,7 @@ contract AgenticGuild is Ownable, ReentrancyGuard {
     
     /**
      * @notice Set the distribution flow rate
-     * @param _flowRate USDC per second (in wei, so 6 decimals)
+     * @param _flowRate USDC per second (in wei, so 18 decimals for SuperToken)
      */
     function setFlowRate(int96 _flowRate) external onlyOwner {
         require(address(pool) != address(0), "Pool not initialized");
@@ -150,8 +153,8 @@ contract AgenticGuild is Ownable, ReentrancyGuard {
         
         flowRate = _flowRate;
         
-        // Update Superfluid flow
-        gda.distributeFlow(usdcx, address(this), pool, _flowRate);
+        // Update Superfluid flow via forwarder
+        gdaForwarder.distributeFlow(usdcx, address(this), pool, _flowRate, "");
         
         emit FlowRateUpdated(_flowRate);
     }

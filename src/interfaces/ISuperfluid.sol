@@ -59,6 +59,27 @@ interface IGeneralDistributionAgreementV1 {
     ) external view returns (int96);
 }
 
+interface IGDAv1Forwarder {
+    function createPool(
+        ISuperToken token,
+        address admin,
+        PoolConfig memory config
+    ) external returns (bool success, ISuperfluidPool pool);
+    
+    function distributeFlow(
+        ISuperToken token,
+        address from,
+        ISuperfluidPool pool,
+        int96 requestedFlowRate,
+        bytes memory userData
+    ) external returns (bool);
+    
+    function connectPool(
+        ISuperfluidPool pool,
+        bytes memory userData
+    ) external returns (bool);
+}
+
 struct PoolConfig {
     bool transferabilityForUnitsOwner;
     bool distributionFromAnyAddress;

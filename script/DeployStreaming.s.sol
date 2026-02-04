@@ -19,6 +19,7 @@ contract DeployStreaming is Script {
     // Base Sepolia Superfluid
     address constant SUPERFLUID_HOST = 0x109412E3C84f0539b43d39dB691B08c90f58dC7c;
     address constant SUPER_TOKEN_FACTORY = 0x7447E94Dfe3d804a9f46Bf12838d467c912C8F6C;
+    address constant GDA_FORWARDER = 0x6DA13Bde224A05a288748d857b9e7DDEffd1dE08;
     
     function run() external {
         uint256 deployerKey = vm.envUint("PRIVATE_KEY");
@@ -52,7 +53,8 @@ contract DeployStreaming is Script {
         AgenticGuild guild = new AgenticGuild(
             address(mockUsdc),
             address(usdcx),
-            SUPERFLUID_HOST
+            SUPERFLUID_HOST,
+            GDA_FORWARDER
         );
         console.log("AgenticGuild deployed:", address(guild));
         
